@@ -1,0 +1,3 @@
+#ifndef  ENGINE_CORE_HPP
+#define  ENGINE_CORE_HPP
+#endif //ENGINE_CORE_HPP

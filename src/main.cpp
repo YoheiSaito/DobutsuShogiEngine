@@ -1,3 +1,4 @@
+#define MAIN_CPP
 #include "common.h"
 
 namespace AnimalEngine{
@@ -35,9 +36,9 @@ int main(int argc, char* argv[]) {
         { EngineMode::Play , "Play" }, { EngineMode::Test , "Test" },
     };
 
-    auto ini_mode = pt.get_optional<std::string>("common.Mode");
+    auto ini_mode = pt.get_optional<std::string>("Common.mode");
     if( !ini_mode ){
-        std::cerr << "[common] Mode={Learn|Teach|Play|Test}" << std::endl;
+        std::cerr << "[Common] mode={Learn|Teach|Play|Test}" << std::endl;
         exit(-1);        
     }
     std::string mode_str = ini_mode.get();

@@ -14,21 +14,36 @@
 #include <iostream>
 #include <random>
 #include <memory>
+#include <regex>
 #include <algorithm>
+#include <tuple>
 #include <iterator>
 #include <list>
 #include <vector>
+#include <array>
 #include <string>
-#include <unordered_map>
 #include <map>
+#include <unordered_map>
+#include <limits>
 
 // c header
-
 namespace AnimalEngine {
-    void learn(boost::property_tree::ptree&, std::string);
-    void teach(boost::property_tree::ptree&, std::string);
-    void play (boost::property_tree::ptree&, std::string);
-    void test (boost::property_tree::ptree&, std::string);
+    enum Turn : bool {
+        BLACK=false,
+        WHITE=true
+    };
+    enum PositionIndex{
+        A1 = 0, B1, C1,
+        A2, B2, C2,
+        A3, B3, C3,
+        A4, B4, C4,
+        Mc, Ml, Me, Mg
+    };
+
+    void learn(boost::property_tree::ptree&, std::string&);
+    void teach(boost::property_tree::ptree&, std::string&);
+    void play (boost::property_tree::ptree&, std::string&);
+    void test (boost::property_tree::ptree&, std::string&);
 }
 
 #endif  //COMMON_H

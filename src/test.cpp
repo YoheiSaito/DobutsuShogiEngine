@@ -1,4 +1,7 @@
-#include  "common.h"
+#include "common.h"
 
-void learn(boost::property_tree::ptree&, std::string){
+namespace AnimalEngine{
+void test(boost::property_tree::ptree&, std::string&){
+
+}
 }
