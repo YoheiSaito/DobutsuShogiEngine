@@ -34,6 +34,7 @@ OBJECTS   = $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.cpp=.o)))
 DEPENDS   = $(OBJECTS:.o=.d)
 
 $(TARGET): $(OBJECTS) $(LIBS)
+	-mkdir -p bin
 	$(COMPILER) -o $@ $^ $(LDFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp makefile
