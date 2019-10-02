@@ -4,6 +4,7 @@
 // original
 
 // other thirdparty
+#include <Eigen/Dense>
 
 // boost
 #include <boost/property_tree/ptree.hpp>
@@ -25,8 +26,8 @@
 #include <map>
 #include <unordered_map>
 #include <limits>
+#include <optional>
 
-// c header
 namespace AnimalEngine {
     enum Turn : bool {
         BLACK=false,
