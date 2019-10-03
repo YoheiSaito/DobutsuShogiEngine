@@ -32,5 +32,7 @@ all: clean $(TARGET)
 
 clean:
 	-rm -f $(OBJECTS) $(DEPENDS) $(TARGET)
+run:
+	./bin/DobutsuShogiEngine ./test.ini
 
 -include $(DEPENDS)
