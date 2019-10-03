@@ -1,9 +1,7 @@
 #ifndef  MOVE_HPP
 #define  MOVE_HPP
 #include "common.h"
-#include "position.hpp"
 namespace AnimalEngine{
-
 static const std::string move_to_str[16] = {
     "A1", "B1", "C1",
     "A2", "B2", "C2",
@@ -20,7 +18,7 @@ struct Move{
             uint8_t dst:4;
         };
     };
-     MoveString mv_str( std::string& raw_board, Turn t) {
+    MoveString mv_str( std::string& raw_board, Turn t) {
         std::string source      (move_to_str[src]);
         std::string destination (move_to_str[dst]);
         if(src >= 12){
