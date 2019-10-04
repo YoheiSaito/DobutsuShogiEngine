@@ -1,16 +1,19 @@
 #define MAIN_CPP
 #include "common.h"
 
-namespace AnimalEngine{
-    enum struct EngineMode:int{ Learn = 0, Teach, Play, Test };
-}
+using namespace AnimalEngine;
 
 int main(int argc, char* argv[]) {
-    using namespace AnimalEngine;
 
     boost::property_tree::ptree pt;
     if(argc < 2){
-        std::cout << argv[0] << u8" なんとか.ini" << std::endl;
+        std::cerr << u8"iniファイルの例\n---\n"  << std::endl;
+        std::string s(
+            #include "example.ini" 
+            );
+        std::cout << s << std::endl;
+        std::cerr << "\n\n---\n\n 使い方 : " << 
+            argv[0] << u8" なんとか.ini\n" << std::endl;
         exit(-1);
     }
     read_ini(argv[1], pt);
