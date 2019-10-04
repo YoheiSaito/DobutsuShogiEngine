@@ -42,6 +42,5 @@ struct Move{
         return std::make_tuple(source, destination);
     }
 };
-using Moves = std::vector<Move>;
 }
 #endif //MOVE_HPP
