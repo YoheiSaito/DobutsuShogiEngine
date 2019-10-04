@@ -1,5 +1,18 @@
 #ifndef COMMON_H
 #define COMMON_H
+#define EXTERNAL_STRING(x) #x
+#define TEST_ASSERT(A) \
+    if( !(A) ){ \
+        std::cout  << u8"❎" << \
+        " - file = " <<__FILE__ << \
+        " - line = " <<__LINE__ << \
+        " \ttest failed" << std::endl;\
+    }else{ \
+        std::cout << u8"❍" << \
+        " - file = " <<__FILE__ << \
+        " - line = " <<__LINE__ << \
+        " \ttest success" << std::endl;\
+    }
 
 // original
 
@@ -26,19 +39,23 @@
 #include <map>
 #include <unordered_map>
 #include <limits>
-#include <optional>
+/* #include <experimental/optional> */
 
 namespace AnimalEngine {
+    enum struct EngineMode:int{ Learn = 0, Teach, Play, Test };
     enum Turn : bool {
         BLACK=false,
         WHITE=true
     };
+    using Owner = Turn;
     enum PositionIndex{
         A1 = 0, B1, C1,
         A2, B2, C2,
         A3, B3, C3,
         A4, B4, C4,
-        Mc, Ml, Me, Mg
+        OB = 12, OB_CHICKIN = 12,
+        OB_LION, OB_ELEPHANT, OB_GIRAFFE
+            
     };
 
     void learn(boost::property_tree::ptree&, std::string&);
