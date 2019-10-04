@@ -37,9 +37,7 @@ struct EngineCore{
         ponder     =      ponder_opt ?      ponder_opt.get() : ponder_default;
     }
     Move consider(){
-        Move s;
-        s.src = A1;
-        s.dst = A1;
+        Move s(A1, A1);
         return s;
     }
     Score alpha_beta (Position&,Turn,int,Score a=Gote_win,Score b=Sente_win);

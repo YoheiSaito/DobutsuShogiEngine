@@ -18,6 +18,10 @@ struct Move{
             uint8_t dst:4;
         };
     };
+    Move(uint8_t sr, uint8_t ds){
+        src = sr;
+        dst = ds;
+    }
     MoveString mv_str( std::string& raw_board, Turn t) {
         std::string source      (move_to_str[src]);
         std::string destination (move_to_str[dst]);
