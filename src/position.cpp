@@ -1,7 +1,8 @@
 #include "position.hpp"
-
+#include "move_definition.hpp"
 
 namespace AnimalEngine{
+
 Position& Position::operator=(const Position& p){
     this->chickin  = p.chickin;
     this->lion     = p.lion;
@@ -14,68 +15,176 @@ Position& Position::operator=(const Position& p){
 std::vector<Position> Position::gen_move(Turn turn){
     std::vector<Position> poses;
     auto board = make_map();
-    std::unordered_map<char, bool> emage_flags = {
-        {'c', false}, {'l', false}, {'e', false}, {'g', false}, 
+    bool ela = elephantA_owner, gra = giraffeA_owner;
+    bool lra =     lionA_owner, cra = chickinA_owner;
+    bool elb = elephantA_owner, grb = giraffeA_owner;
+    bool lrb =     lionA_owner, crb = chickinA_owner;
+    std::unordered_map<char,uint8_t> owner_a = {
+        {'e', ela}, {'g', gra}, {'l', lra}, {'C', cra}, {'h', cra},
+        {'E', ela}, {'G', gra}, {'L', lra}, {'c', cra}, {'H', cra},
     };
-    std::unordered_map<char,PositionSeperator> mp_rf= {
+    std::unordered_map<char,uint8_t> owner_b = {
+        {'e', elb}, {'g', grb}, {'l', lrb}, {'C', crb}, {'h', crb},
+        {'E', elb}, {'G', grb}, {'L', lrb}, {'c', crb}, {'H', crb},
+    };
+    std::unordered_map<char, PositionSeperator> mp_rf= {
         {'e', elephant}, {'g', giraffe}, {'l', lion},
         {'E', elephant}, {'G', giraffe}, {'L', lion},
         {'C',  chickin}, {'h', chickin},
         {'c',  chickin}, {'H', chickin}, 
     };
-    bool ela = elephantA_owner;
-    bool gra = giraffeA_owner;
-    bool lra = lionA_owner;
-    bool cra = chickinA_owner;
-    std::unordered_map<char,uint8_t> owner_a = {
-        {'e', ela}, {'g', gra}, {'l', lra}, {'C', cra}, {'h', cra},
-        {'E', ela}, {'G', gra}, {'L', lra}, {'c', cra}, {'H', cra},
-    };
-    bool elb = elephantA_owner;
-    bool grb = giraffeA_owner;
-    bool lrb = lionA_owner;
-    bool crb = chickinA_owner;
-    std::unordered_map<char,uint8_t> owner_b = {
-        {'e', elb}, {'g', grb}, {'l', lrb}, {'C', crb}, {'h', crb},
-        {'E', elb}, {'G', grb}, {'L', lrb}, {'c', crb}, {'H', crb},
-    };
+
 
     auto putted = std::get<0>(board);
     auto having = turn ? std::get<1>(board): std::get<2>(board);
     // put
-    for(auto&& p : having){ // todo 順序を利用したcontinue <-> unordered_map
-        if(!emage_flags[p] ){
-            emage_flags[p] = true;
-            for(int i = 0; i < OB; i++){
-                if(putted[i] ==' '){
-                    if       (owner_a[p] == turn && mp_rf[p].a_pos >= OB){
+    for(size_t h = 0; h < having.size(); h+=2){
+        { // koma a
+            size_t j = h;
+            auto&& p = having[j];
+            if( p != ' ' ){
+                for(int i = 0; i < OB; i++){
+                    if(putted[i] ==' ' && mp_rf[p].a_pos >= OB){
                         auto tmp = mp_rf[p].a_pos;
                         mp_rf[p].a_pos = i;
                         poses.push_back(*this);
-                        mp_rf[p].a_pos =tmp;
-                    } else if(owner_b[p] == turn && mp_rf[p].b_pos >= OB){
+                        mp_rf[p].a_pos = tmp;
+                    }
+                }
+            }
+            continue;
+        }{ // koma b
+            size_t j = h+1;
+            auto&& p = having[j];
+            if( p != ' ' ){
+                for(int i = 0; i < OB; i++){
+                    if(putted[i] ==' ' && mp_rf[p].b_pos >= OB){
                         auto tmp = mp_rf[p].b_pos;
                         mp_rf[p].b_pos = i;
                         poses.push_back(*this);
                         mp_rf[p].b_pos = tmp;
                     }
                 }
+            } 
+        }
+    }
+
+    for(uint8_t i = 0; i < OB; i++){
+        char& p = putted[i];
+        if( p == ' ' ) continue;
+        if( turn == BLACK && std::islower(p) ){
+            std::vector<uint8_t> v = move_definition[p][i];
+            for(auto&& dst : v){
+
+                if( !std::islower(putted[dst]) ){
+                   Position p = this->move({i, dst}, turn, board);
+                    poses.push_back(p);
+                }
+            }
+        }
+        else if( turn == WHITE && std::isupper(p) ){
+            std::vector<uint8_t> v = move_definition[p][i];
+            for(auto&& dst : v){
+                if( !std::islower(putted[dst]) ){
+                    Position p = this->move({i, dst}, turn, board);
+                    poses.push_back(p);
+                }
             }
         }
     }
+
     // move
-    /* pos.push_back(*this); */
     return poses;
 }
-/* Position Position::move(Move mv, Turn turn, boost::optional<BoardMap> mp){ */
-/*     BoardMap bm = mp ? mp.get():  make_map(); */
-/*     Position p = *this; */
-/*     auto koma = std::get<0>(bm)[mv.dst]; */
-/*     if(std::get<0>(bm)[mv.src]){ */
-/*     } */
+Position Position::move(Move mv, Turn turn, const boost::optional<BoardMap> mp){
+    BoardMap bm = mp ? mp.get():  make_map();
+    Position p = *this;
+    auto board = std::get<0>(bm);
+    switch(board[mv.dst]){
+        case 'H':
+        case 'h':
+        case 'C':
+        case 'c':
+            if( p.chickin.a_pos == mv.dst ){
+                p.chickinA_owner = turn;
+                p.chickin.a_pos = OB_CHICKIN;
+            }else if( p.chickin.b_pos == mv.dst ){
+                p.chickinB_owner = turn;
+                p.chickin.b_pos = OB_CHICKIN;
+            }
+            break;
+        case 'L':
+        case 'l':
+            if( p.lion.a_pos == mv.dst ){
+                p.lionA_owner = turn;
+                p.lion.a_pos = OB_LION;
+            }else if( p.lion.b_pos == mv.dst ){
+                p.lionB_owner = turn;
+                p.lion.b_pos = OB_LION;
+            }
+            break;
+        case 'E':
+        case 'e':
+            if( p.elephant.a_pos == mv.dst ){
+                p.elephantA_owner = turn;
+                p.elephant.a_pos = OB_ELEPHANT;
+            }else if( p.elephant.b_pos == mv.dst ){
+                p.elephantB_owner = turn;
+                p.elephant.b_pos = OB_ELEPHANT;
+            }
 
-/*     return p; */
-/* } */
+            break;
+        case 'g':
+        case 'G':
+            if( p.giraffe.a_pos == mv.dst ){
+                p.giraffeA_owner = turn;
+                p.giraffe.a_pos = OB_GIRAFFE;
+            }else if( p.giraffe.b_pos == mv.dst ){
+                p.giraffeB_owner = turn;
+                p.giraffe.b_pos = OB_GIRAFFE;
+            }
+            break;
+        case ' ':
+        default:
+            break;
+    }
+    switch(board[mv.src]){
+        case 'H':
+        case 'h':
+        case 'C':
+        case 'c':
+            if( p.chickin.a_pos == mv.src )
+                p.chickin.a_pos = mv.dst;
+            if( p.chickin.b_pos == mv.src )
+                p.chickin.b_pos = mv.dst;
+            break;
+        case 'L':
+        case 'l':
+            if( p.lion.a_pos == mv.src )
+                p.lion.a_pos = mv.dst;
+            if( p.lion.b_pos == mv.src )
+                p.lion.b_pos = mv.dst;
+            break;
+        case 'E':
+        case 'e':
+            if( p.elephant.a_pos == mv.src )
+                p.elephant.a_pos = mv.dst;
+            if( p.elephant.b_pos == mv.src )
+                p.elephant.b_pos = mv.dst;
+            break;
+        case 'g':
+        case 'G':
+            if( p.giraffe.a_pos == mv.src )
+                p.giraffe.a_pos = mv.dst;
+            if( p.giraffe.b_pos == mv.src )
+                p.giraffe.b_pos = mv.dst;
+            break;
+        case ' ':
+        default:
+            break;
+    }
+    return p;
+}
 
 bool Position::operator==(const Position& p){
     bool ret = this->owner == p.owner;
@@ -132,52 +241,62 @@ BoardMap Position::make_map(){
     StArray<12> board;
     StArray<8>  black;
     StArray<8>  white;
-    int b = 0, w = 0;
     for(auto&& c : board) c = ' ';
     for(auto&& c : black) c = ' ';
     for(auto&& c : white) c = ' ';
 
     char cb = chickinA_promote ? 'h':'c';
     char cw = chickinA_promote ? 'H':'C';
+
     char cc = elephantA_owner == Turn::BLACK? cb:cw;
-    if(chickin.a_pos < 12)
+    if(chickin.a_pos < OB)
         board[chickin.a_pos] = cc;
-    else 
-        (chickinA_owner == BLACK?black[0]:white[0]) = cc;
-    cb = chickinB_promote ? 'h':'c';
-    cw = chickinB_promote ? 'H':'C';
-    cc = elephantA_owner == Turn::BLACK? cb:cw;
-    if(chickin.b_pos < 12)
+    else {
+        if(chickinA_owner == BLACK)
+            black[0] = 'c';
+        else 
+            white[0] = 'C';
+    }
+
+    cc = chickinB_owner == Turn::BLACK? cb:cw;
+    if(chickin.b_pos < OB)
         board[chickin.b_pos] = cc;
-    else
-        (chickinB_owner == BLACK?black[1]:white[1]) = cc;
+    else{
+        if(chickinB_owner == BLACK)
+            black[1] = 'c';
+        else 
+            white[1] = 'C';
+    }
 
     char ce = elephantA_owner == Turn::BLACK?'e':'E';
-    if(elephant.a_pos < 12)
+    if(elephant.a_pos < OB)
         board[elephant.a_pos] = ce;
     else 
         (elephantA_owner == BLACK?black[2]:white[2]) = ce;
-    if(elephant.b_pos < 12)
+    ce = elephantB_owner == Turn::BLACK?'e':'E';
+    if(elephant.b_pos < OB)
         board[elephant.b_pos] = ce;
     else
         (elephantB_owner == BLACK?black[3]:white[3]) = ce;
 
     char cg = giraffeA_owner == Turn::BLACK?'g':'G';
-    if(giraffe.a_pos < 12)
+    if(giraffe.a_pos < OB)
         board[giraffe.a_pos] = cg;
     else 
         (giraffeA_owner == BLACK?black[4]:white[4]) = cg;
-    if(giraffe.b_pos < 12)
+    cg = giraffeB_owner == Turn::BLACK?'g':'G';
+    if(giraffe.b_pos < OB)
         board[giraffe.b_pos] = cg;
     else
         (giraffeB_owner == BLACK?black[5]:white[5]) = cg;
 
-    char cl = giraffeA_owner == Turn::BLACK?'l':'L';
-    if(lion.a_pos < 12)
+    char cl = lionA_owner == Turn::BLACK?'l':'L';
+    if(lion.a_pos < OB)
         board[lion.a_pos] =  cl;
     else 
         (lionA_owner == BLACK?black[6]:white[6]) = cl;
-    if(lion.b_pos < 12)
+    cl = lionB_owner == Turn::BLACK?'l':'L';
+    if(lion.b_pos < OB)
         board[lion.b_pos] =  cl;
     else 
         (lionB_owner == BLACK?black[7]:white[7]) = cl;
@@ -186,16 +305,19 @@ BoardMap Position::make_map(){
 }
 
 
-void Position::set_chickinA_pos (PositionIndex p, Owner owner, bool promote){
+void Position::set_chickinA_pos (PositionIndex p, Owner owner, boost::optional<bool> promote){
     this->chickin.a_pos = p;
     this->chickinA_owner = owner;
-    chickinA_promote = promote;
+    if(promote)
+        chickinA_promote = promote.get();
 }
-void Position::set_chickinB_pos (PositionIndex p, Owner owner, bool promote){
+void Position::set_chickinB_pos (PositionIndex p, Owner owner, boost::optional<bool> promote){
     this->chickin.b_pos = p;
     this->chickinB_owner = owner;
-    chickinB_promote = promote;
+    if(promote)
+        chickinB_promote = promote.get();
 }
+
 void Position::set_lionA_pos (PositionIndex p, Owner owner){
     this->lion.a_pos = p;
     this->lionA_owner = owner;
@@ -223,13 +345,12 @@ void Position::set_giraffeB_pos (PositionIndex p, Owner owner){
 
 void Position::test(){
     
-    // print
     std::cout << "operator() test" << std::endl;
     {
         Position s = initial_position();
         std::string initial_print=
             "-------------\n" 
-            "      \n"
+            "        \n"
             "-------------\n"
             "-------------\n"
             "| G | L | E |\n"
@@ -241,12 +362,12 @@ void Position::test(){
             "| e | l | g |\n"
             "-------------\n" 
             "-------------\n" 
-            "      \n"
+            "        \n"
             "-------------\n"
         ;
         std::string b3b2_print=
             "-------------\n" 
-            "      \n"
+            "        \n"
             "-------------\n"
             "-------------\n"
             "| G | L | E |\n"
@@ -258,7 +379,7 @@ void Position::test(){
             "| e | l | g |\n"
             "-------------\n" 
             "-------------\n" 
-            "c     \n"
+            " c      \n"
             "-------------\n"
         ;
         Position b3b2 = initial_position();
@@ -282,6 +403,10 @@ void Position::test(){
         b4c3.set_lionA_pos(C3, BLACK);
         b4a3.set_lionA_pos(A3, BLACK);
         std::vector<Position> pos_next = initial_position().gen_move(BLACK);
+        for(auto && p : pos_next){
+            std::cout << __LINE__ << std::endl;
+            std::cout << p() << std::endl;
+        }
         auto itr_b3b2 = std::find(pos_next.begin(), pos_next.end(), b3b2);
         auto itr_c4c3 = std::find(pos_next.begin(), pos_next.end(), c4c3);
         auto itr_b4c3 = std::find(pos_next.begin(), pos_next.end(), b4c3);
@@ -348,6 +473,6 @@ Position Position::initial_position(void){
     return p;
 } 
 
-}
+} // namespace AnimalEngine
 
 
