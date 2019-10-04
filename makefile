@@ -1,5 +1,6 @@
-COMPILER  = clang++ -std=c++17
-CFLAGS    = -MMD -MP -Wall -Wextra -Winit-self -Wno-missing-field-initializers -Ofast -mavx2 -fopenmp
+# COMPILER  = clang++ -std=c++17 -Ofast
+COMPILER  = clang++ -std=c++17 -g
+CFLAGS    = -MMD -MP -Wall -Wextra -Winit-self -Wno-missing-field-initializers -mavx2 -fopenmp
 ifeq "$(shell getconf LONG_BIT)" "64"
   LDFLAGS = 
 else
@@ -30,7 +31,7 @@ OBJDIR    = ./obj
 ifeq "$(strip $(OBJDIR))" ""
   OBJDIR  = .
 endif
-OBJECTS   = $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.cpp=.o)))
+OBJECTS         = $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.cpp=.o)))
 DEPENDS   = $(OBJECTS:.o=.d)
 
 $(TARGET): $(OBJECTS) $(LIBS)
@@ -45,7 +46,14 @@ all: clean $(TARGET)
 
 clean:
 	-rm -f $(OBJECTS) $(DEPENDS) $(TARGET)
-run:
+run: $(TARGET)
+	clear
 	./bin/DobutsuShogiEngine ./test.ini
+
+$(DEBUG_TARGET): $(DEBUG_OBJECTS) $(LIBS)
+	-mkdir -p bin
+	$(DEBUG_COMPILER) -o $@ $^ $(LDFLAGS)
+debug: $(DEBUG_TARGET)
+	lldb ./bin/DobutsuShogiEngine-debug  ./test.ini
 
 -include $(DEPENDS)

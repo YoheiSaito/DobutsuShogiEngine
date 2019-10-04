@@ -1,7 +1,1 @@
-[
-    {
-        "command": "c++ -c -Wall -Wextra -Winit-self -Wno-missing-field-initializers -Ofast -mavx2 -fopenmp -I/home/saito/.linuxbrew/Cellar/eigen/3.3.7/include/eigen3 -o obj/main.o /home/saito/Documents/DobutsuShogiEngine/src/main.cpp",
-        "directory": "/home/saito/Documents/DobutsuShogiEngine",
-        "file": "/home/saito/Documents/DobutsuShogiEngine/src/main.cpp"
-    }
-]
+[]
