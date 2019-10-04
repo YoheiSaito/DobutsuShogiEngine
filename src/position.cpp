@@ -11,6 +11,31 @@ Position& Position::operator=(const Position& p){
     return *this;
 };
 
+void Position::input_from_command(const std::string& st){
+    std::stringstream ss;
+    ss << st;
+    std::vector<std::tuple<std::string, std::string>> info;
+    std::string buffer;
+    std::map<std::string, uint8_t> pos_str_to = {
+        {"A1", A1}, {"A2", A2}, {"A3", A3}, {"A4", A4},
+        {"B1", B1}, {"B2", B2}, {"B3", B3}, {"B4", B4},
+        {"C1", C1}, {"C2", C2}, {"C3", C3}, {"C4", C4},
+        {"D1", OB}, {"D2", OB}, {"D3", OB}, {"D4", OB}, {"D5", OB}, {"D6", OB},
+        {"E1", OB}, {"E2", OB}, {"E3", OB}, {"E4", OB}, {"E5", OB}, {"E6", OB},
+    };
+    std::map<char,bool> koma_emage = {
+        {""}
+    }
+    while(std::getline(ss, buffer, ',')){
+        auto e = buffer.end();
+        if(e == buffer.begin())
+            break;
+        std::string posi(std::prev(e, 5), std::prev(e,3));
+        std::string koma(std::prev(e, 2), std::prev(e,0));
+        if(posi[0] != 'D' &&  posi[0] != 'E'){
+        }
+    }
+}
 
 std::vector<Position> Position::gen_move(Turn turn){
     std::vector<Position> poses;
@@ -77,7 +102,7 @@ std::vector<Position> Position::gen_move(Turn turn){
             for(auto&& dst : v){
 
                 if( !std::islower(putted[dst]) ){
-                   Position p = this->move({i, dst}, turn, board);
+                    Position p = this->move({i, dst}, turn, board);
                     poses.push_back(p);
                 }
             }
@@ -344,7 +369,7 @@ void Position::set_giraffeB_pos (PositionIndex p, Owner owner){
 }
 
 void Position::test(){
-    
+
     std::cout << "operator() test" << std::endl;
     {
         Position s = initial_position();
@@ -364,7 +389,7 @@ void Position::test(){
             "-------------\n" 
             "        \n"
             "-------------\n"
-        ;
+            ;
         std::string b3b2_print=
             "-------------\n" 
             "        \n"
@@ -381,13 +406,19 @@ void Position::test(){
             "-------------\n" 
             " c      \n"
             "-------------\n"
-        ;
+            ;
         Position b3b2 = initial_position();
         b3b2.set_chickinA_pos(B2, BLACK);
         b3b2.set_chickinB_pos(OB_CHICKIN, BLACK);
 
         TEST_ASSERT(s() == initial_print);
         TEST_ASSERT(b3b2() == b3b2_print);
+
+        std::cout << "hash test"  << std::endl;
+        TEST_ASSERT(Position::hash(s) == Position::hash(initial_position()));
+        TEST_ASSERT(Position::hash(s) != Position::hash(b3b2));
+        std::cout << Position::hash(s)<<std::endl;
+        std::cout << Position::hash(b3b2)<<std::endl;
     }
 
     // move generate test
@@ -407,15 +438,10 @@ void Position::test(){
             std::cout << __LINE__ << std::endl;
             std::cout << p() << std::endl;
         }
-        auto itr_b3b2 = std::find(pos_next.begin(), pos_next.end(), b3b2);
-        auto itr_c4c3 = std::find(pos_next.begin(), pos_next.end(), c4c3);
-        auto itr_b4c3 = std::find(pos_next.begin(), pos_next.end(), b4c3);
-        auto itr_b4a3 = std::find(pos_next.begin(), pos_next.end(), b4a3);
-
-        TEST_ASSERT(itr_b3b2 != pos_next.end());
-        TEST_ASSERT(itr_c4c3 != pos_next.end());
-        TEST_ASSERT(itr_b4c3 != pos_next.end());
-        TEST_ASSERT(itr_b4a3 != pos_next.end());
+        TEST_ASSERT((Position::hash(b3b2) == Position::hash(pos_next[0])))
+            TEST_ASSERT((Position::hash(b4a3) == Position::hash(pos_next[1])))
+            TEST_ASSERT((Position::hash(b4c3) == Position::hash(pos_next[2])))
+            TEST_ASSERT((Position::hash(c4c3) == Position::hash(pos_next[3])))
     }
 
     // tsumi test
@@ -456,9 +482,11 @@ void Position::test(){
         TEST_ASSERT(tri.is_tsumi(BLACK) ==  false);
         TEST_ASSERT(tri.is_tsumi(WHITE) ==   true);
     }
+    Position p;
+    std::string ss("A1 g2, B1 l2, C1 e2, A2 --, B2 c2, C2 --, A3 --, B3 c1, C3 --, A4 e1, B4 l1, C4 g1,");
+    p.input_from_command(ss);
 
 
-    
 }
 Position Position::initial_position(void){
     Position p;

@@ -80,7 +80,7 @@ struct Position {
     BoardMap make_map();
     Position move(Move, Turn, boost::optional<BoardMap> mp = boost::none);
     std::vector<Position> gen_move(Turn turn);
-
+    void input_from_command(const std::string& s);
     // static
     static void test();
     static Position initial_position();
