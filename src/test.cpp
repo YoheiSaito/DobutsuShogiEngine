@@ -17,12 +17,12 @@ void SelfPlay(boost::property_tree::ptree& pt, bool view){
                 if(view)
                     std::cout << board() << std::endl;
                 auto mv = black.consider();
-                board = board.move(mv);
+                board = board.move(mv, BLACK);
             }{
                 if(view)
                     std::cout << board() << std::endl;
                 auto mv = white.consider();
-                board = board.move(mv);
+                board = board.move(mv, WHITE);
                 throw Turn::WHITE;
             }
 
