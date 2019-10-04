@@ -31,8 +31,9 @@ struct Evaluation<StaticKomawari> {
         stc_komawari << ck, ci, el, gr, kn;
     }
  
-    Score operator()(Position& p, Turn t){
-        Eigen::Matrix<float, 5, 1> b;
+    Score operator()(Position& , Turn ){
+        /* Eigen::Matrix<float, 5, 1> b; */
+        return 0;
     }
 
 };
