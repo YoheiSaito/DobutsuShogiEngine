@@ -8,7 +8,7 @@
         " - line = " <<__LINE__ << \
         " \ttest failed" << std::endl;\
     }else{ \
-        std::cout << u8"❍" << \
+        std::cout << u8"✔" << \
         " - file = " <<__FILE__ << \
         " - line = " <<__LINE__ << \
         " \ttest success" << std::endl;\
